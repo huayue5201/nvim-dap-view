@@ -1,3 +1,4 @@
+-- nvim-dap-view/lua/dap-view/breakpoints/vendor/init.lua
 local M = {}
 
 local NVIM_DAP_NAMESPACE = "dap_breakpoints"
@@ -56,6 +57,18 @@ function M.get(bufnr)
             table.insert(breakpoints, {
                 lnum = breakpoint_sign.lnum,
             })
+        end
+    end
+
+    -- 合并自定义断点（dap-extensions）
+    local ok, registry = pcall(require, "dap-config.dap-extensions.registry")
+    if ok and registry and registry.bps then
+        for _, bp in pairs(registry.bps) do
+            if bp.config and bp.config.bufnr and bp.config.line and bp.enabled ~= false then
+                local bp_bufnr = bp.config.bufnr -- 重命名，避免与外层 bufnr 冲突
+                result[bp_bufnr] = result[bp_bufnr] or {}
+                table.insert(result[bp_bufnr], { lnum = bp.config.line })
+            end
         end
     end
 
