@@ -1,3 +1,5 @@
+local setup = require("dap-view.setup")
+
 local M = {}
 
 local NVIM_DAP_NAMESPACE = "dap_breakpoints"
@@ -35,31 +37,42 @@ local function get_breakpoint_signs(bufnr)
     return result
 end
 
+--- Gather breakpoints from nvim-dap signs and, optionally, from a user-provided
+--- `render.breakpoints.get_extra` hook (custom breakpoints).
+---
 ---@param bufnr? integer
----@return table<integer, { lnum: integer }[]>
+---@return (dapview.ExtraBreakpointEntry | {bufnr: integer, lnum: integer})[]
 function M.get(bufnr)
+    local entries = {}
+
+    -- 1) nvim-dap native source breakpoints (sign group: dap_breakpoints)
     local signs = get_breakpoint_signs(bufnr)
 
-    if #signs == 0 then
-        return {}
-    end
+    for _, buf_signs in ipairs(signs) do
+        local buf = buf_signs.bufnr
 
-    local result = {}
-
-    for _, buf_breakpoint_signs in pairs(signs) do
-        local breakpoints = {}
-        local buf = buf_breakpoint_signs.bufnr
-
-        result[buf] = breakpoints
-
-        for _, breakpoint_sign in pairs(buf_breakpoint_signs.signs) do
-            table.insert(breakpoints, {
+        for _, breakpoint_sign in ipairs(buf_signs.signs) do
+            table.insert(entries, {
+                bufnr = buf,
                 lnum = breakpoint_sign.lnum,
             })
         end
     end
 
-    return result
+    -- 2) Custom breakpoints provided by the user
+    local get_extra = setup.config.render.breakpoints.get_extra
+    if get_extra then
+        local ok, extra = pcall(get_extra)
+        if ok and type(extra) == "table" then
+            for _, entry in ipairs(extra) do
+                if not bufnr or entry.bufnr == bufnr then
+                    table.insert(entries, entry)
+                end
+            end
+        end
+    end
+
+    return entries
 end
 
 return M

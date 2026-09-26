@@ -83,9 +83,16 @@ local M = {}
 ---@class dapview.HoverConfig
 ---@field border? string|string[] Override `winborder` in the hover window
 
+---@class dapview.ExtraBreakpointEntry
+---@field parts dapview.Content[] Pre-rendered content parts
+---@field path? string Path used for jumping
+---@field lnum? integer Line number used for jumping
+---@field remove? fun() Delete callback
+
 ---@class dapview.RenderBreakpointsConfig
 ---@field format fun(line: string, lnum: string, path: string): dapview.Content[]
 ---@field align boolean
+---@field get_extra? fun(): dapview.ExtraBreakpointEntry[] Optional hook for custom breakpoints
 
 ---@class dapview.RenderThreadsConfig
 ---@field format fun(name: string, lnum: string, path: string): dapview.Content[]
@@ -320,6 +327,7 @@ M.config = {
                 }
             end,
             align = false,
+            get_extra = nil,
         },
     },
     virtual_text = {

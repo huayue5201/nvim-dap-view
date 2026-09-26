@@ -20,6 +20,7 @@ function M.validate(config)
     validate("render.breakpoints", {
         format = { breakpoints.format, { "function" } },
         align = { breakpoints.align, { "boolean" } },
+        get_extra = { breakpoints.get_extra, { "function", "nil" } },
     }, breakpoints)
 end
 

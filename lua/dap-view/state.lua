@@ -49,6 +49,7 @@
 ---@field frame_line_by_frame_id table<integer, integer>
 ---@field breakpoint_paths_by_line string[]
 ---@field breakpoint_lines_by_line integer[]
+---@field breakpoint_entries_by_line table<integer, table>
 ---@field expression_views_by_line table<integer, {expression: string, view: dapview.ExpressionView}>
 ---@field variable_views_by_line table<integer, {parent_reference: number, parent_line: integer, view: dapview.VariableView}>
 ---@field sessions_by_line table<integer, dap.Session>
@@ -87,6 +88,7 @@ local M = {
     frame_line_by_frame_id = {},
     breakpoint_paths_by_line = {},
     breakpoint_lines_by_line = {},
+    breakpoint_entries_by_line = {},
     expression_views_by_line = {},
     variable_views_by_line = {},
     sessions_by_line = {},
