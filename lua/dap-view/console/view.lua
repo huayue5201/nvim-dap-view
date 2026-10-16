@@ -23,7 +23,7 @@ M.fetch_term_buf = function(session)
     ---@type dap.Session?
     local parent = session
     while parent ~= nil do
-        if parent.term_buf then
+        if parent.term_buf and util.is_buf_valid(parent.term_buf) then
             return parent.term_buf
         end
 
